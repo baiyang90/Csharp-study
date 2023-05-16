@@ -5,7 +5,7 @@ namespace ConsoleApp1
     internal class Program
     {
 
-        
+
         static async Task Main(string[] args)
         {
 
@@ -23,12 +23,16 @@ namespace ConsoleApp1
             return Task.CompletedTask;
         }
         public static async Task Gethttpstring(string url, string filename)
+        {
+            //HttpClientFactory factory = new HttpClientFactory();
+            using(HttpClient client = new HttpClient())
             {
-            HttpClientFactory
-            HttpClient client = new HttpClient();
-            string s = await client.GetStringAsync(url);
-            await File.WriteAllTextAsync(filename, s);
+                string s = await client.GetStringAsync(url);
+                await File.WriteAllTextAsync(filename, s);
             }
+                
+        }
+
     }
 
 
