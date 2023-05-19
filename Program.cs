@@ -1,39 +1,90 @@
-﻿using System.Net.Http;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace ConsoleApp1
 {
     internal class Program
     {
-
-
-        static async Task Main(string[] args)
+        private static void Main(string[] args)
         {
-
-            //Console.WriteLine("ssss");
-            //await Testasync();
-            //Console.WriteLine("bbbbb");
-            await Gethttpstring(@"http://www.baidu.com", @"c:\by\baidu.txt");
-            Console.WriteLine("123");
-        }
-
-        public static Task Testasync()
-        {
-            Thread.Sleep(1000);
-            Console.WriteLine("这是等待1s得方法");
-            return Task.CompletedTask;
-        }
-        public static async Task Gethttpstring(string url, string filename)
-        {
-            //HttpClientFactory factory = new HttpClientFactory();
-            using(HttpClient client = new HttpClient())
+            ServiceCollection serviceDescriptors = new();
+            serviceDescriptors.AddTransient<Human1>();
+            serviceDescriptors.AddTransient<Human2>();
+            Human1 humantt;
+            using(ServiceProvider sp1 = serviceDescriptors.BuildServiceProvider())
             {
-                string s = await client.GetStringAsync(url);
-                await File.WriteAllTextAsync(filename, s);
+                var humana = sp1.GetService<Human1>();
+                humana.Name = "张三";
+                humana.Say();
+                var humanb = sp1.GetService<Human2>();
+                humanb.Name = "张4";
+                humanb.Say();
+                humantt = humana;
+                Console.WriteLine(object.ReferenceEquals(humantt, humanb));
             }
-                
+            using(ServiceProvider sp2 = serviceDescriptors.BuildServiceProvider())
+            {
+                Human1 humana = sp2.GetService<Human1>();
+                humana.Name = "张三2";
+                humana.Say();
+                Human1 humanb = sp2.GetService<Human1>();
+                humanb.Name = "张42";
+                humanb.Say();
+                Console.WriteLine(object.ReferenceEquals(humantt, humana));
+            }
         }
-
     }
 
+    internal interface IHuman
+    {
+        public string Name
+        {
+            get; set;
+        }
 
+        void Say();
+    }
+
+    internal class Human1 : IHuman
+    {
+        public string Name
+        {
+            get
+            {
+                if(Name != null)
+                    return Name;
+                return "null";
+            }
+            set
+            {
+                Name = value;
+            }
+        }
+
+        public void Say()
+        {
+            Console.WriteLine("Hello,My name is " + Name);
+        }
+    }
+
+    internal class Human2 : IHuman
+    {
+        public string Name
+        {
+            get
+            {
+                if(Name != null)
+                    return Name;
+                return "null";
+            }
+            set
+            {
+                Name = value;
+            }
+        }
+
+        public void Say()
+        {
+            Console.WriteLine("Hello,My pig is " + Name);
+        }
+    }
 }
